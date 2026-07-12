@@ -20,7 +20,7 @@
       "Province": {
         "type": "object",
         "properties": {
-          "id": {
+          "province_id": {
             "type": "integer",
             "example": 1
           },
@@ -33,7 +33,7 @@
       "District": {
         "type": "object",
         "properties": {
-          "id": {
+          "district_id": {
             "type": "integer",
             "example": 1
           },
@@ -50,7 +50,7 @@
       "Station": {
         "type": "object",
         "properties": {
-          "id": {
+          "station_id": {
             "type": "integer",
             "example": 1
           },
@@ -67,11 +67,32 @@
       "Vehicle": {
         "type": "object",
         "properties": {
-          "id": {
+          "vehicle_id": {
             "type": "integer",
             "example": 1
           },
-          "register_number": {
+          "reg_number": {
+            "type": "string",
+            "example": "HB-6168"
+          },
+          "device_id": {
+            "type": "string",
+            "example": "TUK-DEV-520651"
+          },
+          "station_id": {
+            "type": "integer",
+            "example": 4
+          }
+        }
+      },
+      "VehicleComposite": {
+        "type": "object",
+        "properties": {
+          "vehicle_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "reg_number": {
             "type": "string",
             "example": "HB-6168"
           },
@@ -89,10 +110,36 @@
           }
         }
       },
+      "LastPosition": {
+        "type": "object",
+        "properties": {
+          "vehicle_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-14T00:00:00Z"
+          },
+          "lat": {
+            "type": "number",
+            "example": 7.312694
+          },
+          "lng": {
+            "type": "number",
+            "example": 80.60383
+          },
+          "speed": {
+            "type": "number",
+            "example": 45.5
+          }
+        }
+      },
       "Ping": {
         "type": "object",
         "properties": {
-          "id": {
+          "ping_id": {
             "type": "integer",
             "example": 1
           },
@@ -100,18 +147,22 @@
             "type": "integer",
             "example": 1
           },
-          "latitude": {
-            "type": "number",
-            "example": 7.312694
-          },
-          "longitude": {
-            "type": "number",
-            "example": 80.60383
-          },
           "timestamp": {
             "type": "string",
             "format": "date-time",
             "example": "2026-06-14T00:00:00Z"
+          },
+          "lat": {
+            "type": "number",
+            "example": 7.312694
+          },
+          "lng": {
+            "type": "number",
+            "example": 80.60383
+          },
+          "speed": {
+            "type": "number",
+            "example": 45.5
           }
         }
       },
@@ -176,13 +227,13 @@
         }
       }
     },
-    "/provinces/{provinceId}": {
+    "/provinces/{id}": {
       "get": {
         "summary": "Get province by ID",
         "description": "Retrieves details of a specific province by its ID.",
         "parameters": [
           {
-            "name": "provinceId",
+            "name": "id",
             "in": "path",
             "required": true,
             "description": "ID of the province to retrieve",
@@ -237,13 +288,13 @@
         }
       }
     },
-    "/districts/{districtId}": {
+    "/districts/{id}": {
       "get": {
         "summary": "Get district by ID",
         "description": "Retrieves details of a specific district by its ID.",
         "parameters": [
           {
-            "name": "districtId",
+            "name": "id",
             "in": "path",
             "required": true,
             "description": "ID of the district to retrieve",
@@ -298,13 +349,13 @@
         }
       }
     },
-    "/stations/{stationId}": {
+    "/stations/{id}": {
       "get": {
         "summary": "Get station by ID",
         "description": "Retrieves details of a specific police station by its ID.",
         "parameters": [
           {
-            "name": "stationId",
+            "name": "id",
             "in": "path",
             "required": true,
             "description": "ID of the station to retrieve",
@@ -359,13 +410,13 @@
         }
       }
     },
-    "/vehicles/{vehicleId}": {
+    "/vehicles/{id}": {
       "get": {
         "summary": "Get vehicle by ID",
         "description": "Retrieves details of a specific vehicle along with its latest GPS ping.",
         "parameters": [
           {
-            "name": "vehicleId",
+            "name": "id",
             "in": "path",
             "required": true,
             "description": "ID of the vehicle to retrieve",
@@ -381,7 +432,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Vehicle"
+                  "$ref": "#/components/schemas/VehicleComposite"
                 }
               }
             }
@@ -399,13 +450,53 @@
         }
       }
     },
-    "/vehicles/{vehicleId}/pings": {
+    "/vehicles/{id}/last-position": {
+      "get": {
+        "summary": "Get most recent position for a vehicle",
+        "description": "Retrieves the most recent LocationPing coordinates for a specific vehicle.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the vehicle",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest position found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LastPosition"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Position or vehicle not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vehicles/{id}/pings": {
       "get": {
         "summary": "Get ping history for a vehicle",
         "description": "Retrieves all GPS ping records associated with a specific vehicle ID.",
         "parameters": [
           {
-            "name": "vehicleId",
+            "name": "id",
             "in": "path",
             "required": true,
             "description": "ID of the vehicle whose pings to retrieve",
