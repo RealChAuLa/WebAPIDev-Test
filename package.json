@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/RealChAuLa/WebAPIDev-Test#readme",
   "dependencies": {
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "mongoose": "^9.7.4",
     "swagger-ui-express": "^5.0.1"
   }
 }
